@@ -3,18 +3,30 @@
 const { BadRequestError } = require("../expressError");
 
 /**
- * Receives an object of column names and update data and a dictionary of JS/SQL variable names
- * Takes Javascript keys from dataToUpdate and maps their SQL column names to sanitized values
- * Returns an object containing two keys - setCols is a string of column names and their sanitized values,
- * Values is an array of updated column values/data
+ * Translates PATCH data (dataToUpdate) to SQL-friendly string of column names and
+ * sanitized values
  *
+ * Returns an object containing this SQL-friendly string and an array of the
+ * provided PATCH data values
  *
+ * Receives:
+ * @param {*} dataToUpdate  -- Object that can contain any number of column
+ * names and update data values
  *
+ * dataToUpdate ==> {firstName: 'Aliya', lastName: 'Jones', email: 'ajones@gmail.com'}
  *
- * @param {*} dataToUpdate  -- object that can contain any number of data keys/values
- * @param {*} jsToSql -- object keys are javascript variable names, values are sql columns
- * @returns an object containing two keys - setCols is a string of column names and their sanitized values
- * values is an array of updated column values/data
+ * @param {*} jsToSql -- Object where keys are Javascript variable names and
+ * values are their counterpart SQL column names
+ *
+ * jsToSQL ==> {firstName: 'first_name', lastName: 'last_name'}
+ *
+ * @returns An object containing two keys:
+ * setCols: a string of column names and their sanitized values
+ * ex. "first_name=$1, last_name=$2, email=$3"
+ *
+ * values: an array of data values that correspond to the sanitized
+ * values in setCols
+ * ex. ['Aliya', 'Jones', 'ajones@gmail.com']
  */
 
 
