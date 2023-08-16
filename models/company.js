@@ -77,7 +77,7 @@ class Company {
 
   static async get(handle) {
     const companyRes = await db.query(`
-        SELECT handle,
+        SELECT handle, 
                name,
                description,
                num_employees AS "numEmployees",

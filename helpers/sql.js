@@ -48,3 +48,14 @@ function sqlForPartialUpdate(dataToUpdate, jsToSql) {
 }
 
 module.exports = { sqlForPartialUpdate };
+
+
+
+/**
+ * get request
+ * URL key: value pairs
+ * nameLike, minEmployees, maxEmployees - only allow these specific keys
+ *
+ *grab the key and index (for sanitizing purpose)
+ * {}
+
