@@ -74,9 +74,10 @@ class Company {
    * @returns => {handle, name, description, numEmployees, logoURL} for companies
    * matching search criteria
    */
-  static async filter(queryData) {
+  static async filterCompanies(queryData) {
     const { where, values } = this.getFilteredQuery(queryData);
-
+    console.log("where clause=", where);
+    console.log('values clause=', values);
     const companiesRes = await db.query(`
     SELECT handle,
            name,
@@ -86,7 +87,7 @@ class Company {
     FROM companies
     WHERE ${where}`, [...values]);
 
-    // console.log("companiesRes", companiesRes.rows);
+    //console.log("companiesRes", companiesRes.rows);
     return companiesRes.rows;
   }
 
@@ -144,7 +145,7 @@ class Company {
 
     for (let i = 0; i < keys.length; i++) {
       if (keys[i] === "nameLike") {
-        whereQuery.push(`name ILIKE %$${i + 1}%`);
+        whereQuery.push(`name ILIKE '%$${i + 1}%'`);
       } else if (keys[i] === "minEmployees") {
         whereQuery.push(`num_employees <= $${i + 1}`);
         queryData.minEmployees = Number(queryData.minEmployees);
@@ -162,7 +163,7 @@ class Company {
     //   } else if (key === "maxEmployees") {
     //     `num_employees >= $${idx + 1}`;
     //  }});
-    console.log("whereQuery=", whereQuery);
+    //console.log("whereQuery=", whereQuery);
 
     return {
       where: whereQuery.join(' AND '),

@@ -28,7 +28,7 @@ router.post("/", ensureLoggedIn, async function (req, res, next) {
   const validator = jsonschema.validate(
     req.body,
     companyNewSchema,
-    {required: true}
+    { required: true }
   );
   if (!validator.valid) {
     const errs = validator.errors.map(e => e.stack);
@@ -48,14 +48,30 @@ router.post("/", ensureLoggedIn, async function (req, res, next) {
  * - nameLike (will find case-insensitive, partial matches)
  *
  * Authorization required: none
+ *
+ * Throws BadRequestError if any search filters provided do not match those above
  */
 
 router.get("/", async function (req, res, next) {
-  // check req.query for any search filter if none then findAll
-  if (req.query ) {
+  let companies;
 
+  const validFilters = ['minEmployees', 'maxEmployees', 'nameLike'];
+  const queries = Object.keys(req.query);
+
+  if (queries.length) {
+    const invalidQueries = queries.filter(query => !validFilters.includes(query));
+
+    if (invalidQueries.length) {
+      throw new BadRequestError(
+        "only valid queries: nameLike, minEmployees, maxEmployees"
+      );
+    } else {
+      companies = await Company.filterCompanies(req.query);
+    }
+  } else {
+    companies = await Company.findAll();
   }
-  const companies = await Company.findAll();
+
   return res.json({ companies });
 });
 
@@ -87,7 +103,7 @@ router.patch("/:handle", ensureLoggedIn, async function (req, res, next) {
   const validator = jsonschema.validate(
     req.body,
     companyUpdateSchema,
-    {required:true}
+    { required: true }
   );
   if (!validator.valid) {
     const errs = validator.errors.map(e => e.stack);

@@ -95,6 +95,36 @@ describe("GET /companies", function () {
           ],
     });
   });
+
+  test("returns filtered companies when query is valid", async function(){
+    const resp = await request(app).get("/companies?minEmployees=2&nameLike=c");
+
+    expect(resp.body).toEqual({
+     companies:
+      [
+        {
+        handle: "c2",
+        name: "C2",
+        numEmployees: 2,
+        description: "Desc2",
+        logoUrl: "http://c2.img",
+      },
+      {
+        handle: "c3",
+        name: "C3",
+        numEmployees: 3,
+        description: "Desc3",
+        logoUrl: "http://c3.img",
+      }
+    ]
+  });
+});
+
+  test("returns BadRequestError when query is invalid", async function(){
+    const resp = await request(app).get("/companies?name=comp&minEmployees=1");
+
+    expect(resp.statusCode).toEqual(400);
+  });
 });
 
 /************************************** GET /companies/:handle */
