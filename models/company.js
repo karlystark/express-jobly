@@ -78,6 +78,7 @@ class Company {
     const { where, values } = this.getFilteredQuery(queryData);
     console.log("where clause=", where);
     console.log('values clause=', values);
+
     const companiesRes = await db.query(`
     SELECT handle,
            name,
@@ -137,7 +138,7 @@ class Company {
       throw new BadRequestError("No data");
     }
 
-    if (Number(queryData.minEmployees) > Number(queryData.maxEmployees)) {
+    if (queryData.minEmployees > queryData.maxEmployees) {
       throw new BadRequestError("minEmployees must be less than maxEmployees");
     }
 
@@ -148,14 +149,13 @@ class Company {
         whereQuery.push(`name ILIKE $${i + 1}`);
       } else if (keys[i] === "minEmployees") {
         whereQuery.push(`num_employees >= $${i + 1}`);
-        queryData.minEmployees = Number(queryData.minEmployees);
       } else if (keys[i] === "maxEmployees") {
         whereQuery.push(`num_employees <= $${i + 1}`);
-        queryData.maxEmployees = Number(queryData.maxEmployees);
       }
     };
 
     console.log("whereQuery=", whereQuery);
+    console.log("values=", Object.values(queryData));
 
     if(queryData.nameLike){
       const val = queryData.nameLike;

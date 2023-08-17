@@ -11,6 +11,7 @@ const Company = require("../models/company");
 
 const companyNewSchema = require("../schemas/companyNew.json");
 const companyUpdateSchema = require("../schemas/companyUpdate.json");
+const companySearchSchema = require("../schemas/companySearch.json");
 
 const router = new express.Router();
 
@@ -54,19 +55,33 @@ router.post("/", ensureLoggedIn, async function (req, res, next) {
 
 router.get("/", async function (req, res, next) {
   let companies;
-
-  const validFilters = ['minEmployees', 'maxEmployees', 'nameLike'];
   const queries = Object.keys(req.query);
+  const queryCopy = req.query;
+
+  //console.log("type of=", typeof req.query.minEmployees);
+  //console.log("minEmployees=", req.query.minEmployees);
 
   if (queries.length) {
-    const invalidQueries = queries.filter(query => !validFilters.includes(query));
+    if ("minEmployees" in req.query) {
+      //console.log("we got here!");
+      queryCopy.minEmployees = Number(queryCopy.minEmployees);
+      //console.log("should be integer here-", typeof queryCopy.minEmployees);
+    }
 
-    if (invalidQueries.length) {
-      throw new BadRequestError(
-        "only valid queries: nameLike, minEmployees, maxEmployees"
-      );
+    if ("maxEmployees" in req.query) {
+      req.query.maxEmployees = Number(req.query.maxEmployees);
+    }
+
+    //console.log("numberReqQuery=", req.query);
+
+    const result = jsonschema.validate(queryCopy, companySearchSchema, { required: true });
+
+    if (!result.valid) {
+      const errs = result.errors.map(err => err.stack);
+      throw new BadRequestError(errs);
     } else {
-      companies = await Company.filterCompanies(req.query);
+      companies = await Company.filterCompanies(queryCopy);
+      console.log("querycopy=",queryCopy);
     }
   } else {
     companies = await Company.findAll();

@@ -123,8 +123,8 @@ describe("getFilteredQuery", function () {
     function () {
       const result = Company.getFilteredQuery({
         nameLike: "c",
-        minEmployees: "2",
-        maxEmployees: "3"
+        minEmployees: 2,
+        maxEmployees: 3
       });
 
       expect(result).toEqual({
@@ -138,7 +138,7 @@ describe("getFilteredQuery", function () {
     function () {
       const result = Company.getFilteredQuery({
         nameLike: "c",
-        maxEmployees: "3"
+        maxEmployees: 3
       });
 
       expect(result).toEqual({
@@ -150,7 +150,7 @@ describe("getFilteredQuery", function () {
   test("returns expected results when passed one query in queryData",
     function () {
       const result = Company.getFilteredQuery({
-        maxEmployees: "3"
+        maxEmployees: 3
       });
 
       expect(result).toEqual({
@@ -171,8 +171,8 @@ describe("getFilteredQuery", function () {
     function () {
       try {
         const result = Company.getFilteredQuery({
-          minEmployees: "3",
-          maxEmployees: "1"
+          minEmployees: 3,
+          maxEmployees: 1
         });
       } catch (err) {
         expect(err instanceof BadRequestError).toBeTruthy();
