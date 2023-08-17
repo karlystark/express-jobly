@@ -145,15 +145,22 @@ class Company {
 
     for (let i = 0; i < keys.length; i++) {
       if (keys[i] === "nameLike") {
-        whereQuery.push(`name ILIKE '%$${i + 1}%'`);
+        whereQuery.push(`name ILIKE $${i + 1}`);
       } else if (keys[i] === "minEmployees") {
-        whereQuery.push(`num_employees <= $${i + 1}`);
+        whereQuery.push(`num_employees >= $${i + 1}`);
         queryData.minEmployees = Number(queryData.minEmployees);
       } else if (keys[i] === "maxEmployees") {
-        whereQuery.push(`num_employees >= $${i + 1}`);
+        whereQuery.push(`num_employees <= $${i + 1}`);
         queryData.maxEmployees = Number(queryData.maxEmployees);
       }
     };
+
+    console.log("whereQuery=", whereQuery);
+
+    if(queryData.nameLike){
+      const val = queryData.nameLike;
+      queryData.nameLike = `%${val}%`;
+    }
 
     //   const whereQuery= keys.map((key, idx) => {
     //     if(key === "nameLike"){
