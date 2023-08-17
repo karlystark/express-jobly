@@ -107,14 +107,14 @@ describe("GET /companies", function () {
         name: "C2",
         numEmployees: 2,
         description: "Desc2",
-        logoUrl: "http://c2.img",
+        logoURL: "http://c2.img",
       },
       {
         handle: "c3",
         name: "C3",
         numEmployees: 3,
         description: "Desc3",
-        logoUrl: "http://c3.img",
+        logoURL: "http://c3.img",
       }
     ]
   });
