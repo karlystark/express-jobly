@@ -162,16 +162,6 @@ class Company {
       queryData.nameLike = `%${val}%`;
     }
 
-    //   const whereQuery= keys.map((key, idx) => {
-    //     if(key === "nameLike"){
-    //     `name ILIKE %$${idx + 1}%`;
-    //   } else if (key === "minEmployees"){
-    //     `num_employees <= $${idx + 1}`;
-    //   } else if (key === "maxEmployees") {
-    //     `num_employees >= $${idx + 1}`;
-    //  }});
-    //console.log("whereQuery=", whereQuery);
-
     return {
       where: whereQuery.join(' AND '),
       values: Object.values(queryData)

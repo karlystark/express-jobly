@@ -69,7 +69,7 @@ router.get("/", async function (req, res, next) {
     }
 
     if ("maxEmployees" in req.query) {
-      req.query.maxEmployees = Number(req.query.maxEmployees);
+      queryCopy.maxEmployees = Number(queryCopy.maxEmployees);
     }
 
     //console.log("numberReqQuery=", req.query);

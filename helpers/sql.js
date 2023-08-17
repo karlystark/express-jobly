@@ -21,7 +21,7 @@ const { BadRequestError } = require("../expressError");
  * jsToSQL ==> {firstName: 'first_name', lastName: 'last_name'}
  *
  * @returns An object containing two keys:
- * setCols: a string of column names and their sanitized values
+ * setCols: a string of column names and their sanitized values // give example of the full object 
  * ex. "first_name=$1, last_name=$2, email=$3"
  *
  * values: an array of data values that correspond to the sanitized

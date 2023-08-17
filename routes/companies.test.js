@@ -97,7 +97,9 @@ describe("GET /companies", function () {
   });
 
   test("returns filtered companies when query is valid", async function(){
-    const resp = await request(app).get("/companies?minEmployees=2&nameLike=c");
+    const resp = await request(app).get(
+      "/companies?minEmployees=2&maxEmployees=3&nameLike=c"
+    ); // request(app).get(/companies).query(minEmployees)
 
     expect(resp.body).toEqual({
      companies:
@@ -127,6 +129,7 @@ describe("GET /companies", function () {
   });
 });
 
+// include error message 
 /************************************** GET /companies/:handle */
 
 describe("GET /companies/:handle", function () {

@@ -89,7 +89,33 @@ describe("findAll", function () {
 
 /************************************** filterCompanies */
 
+describe("filterCompanies", function() {
+  test("works", async function () {
+    const result = await Company.filterCompanies({
+      nameLike: "C",
+      minEmployees: 1,
+      maxEmployees: 2
+    });
 
+    expect(result).toEqual([
+      {
+        handle: "c1",
+        name: "C1",
+        description: "Desc1",
+        numEmployees: 1,
+        logoURL: "http://c1.img",
+      },
+      {
+        handle: "c2",
+        name: "C2",
+        description: "Desc2",
+        numEmployees: 2,
+        logoURL: "http://c2.img",
+      }
+    ]);
+  });
+
+})
 
 
 /************************************** get */
@@ -174,13 +200,14 @@ describe("getFilteredQuery", function () {
           minEmployees: 3,
           maxEmployees: 1
         });
+        throw new Error(); // best practice for error tests 
       } catch (err) {
         expect(err instanceof BadRequestError).toBeTruthy();
       }
     });
 
 });
-
+ //
 
 /************************************** update */
 
