@@ -97,9 +97,9 @@ describe("GET /companies", function () {
   });
 
   test("returns filtered companies when query is valid", async function(){
-    const resp = await request(app).get(
-      "/companies?minEmployees=2&maxEmployees=3&nameLike=c"
-    ); // request(app).get(/companies).query(minEmployees)
+    const resp = await request(app)
+      .get("/companies")
+      .query({ minEmployees: 2, maxEmployees: 3, nameLike: "c"});
 
     expect(resp.body).toEqual({
      companies:
@@ -123,13 +123,15 @@ describe("GET /companies", function () {
 });
 
   test("returns BadRequestError when query is invalid", async function(){
-    const resp = await request(app).get("/companies?name=comp&minEmployees=1");
+    const resp = await request(app)
+      .get("/companies")
+      .query({name: "comp", minEmployees: 1});
 
     expect(resp.statusCode).toEqual(400);
+    //expect(resp.error.message).toEqual("instance is not allowed to have the additional property \"name\"");
   });
 });
 
-// include error message 
 /************************************** GET /companies/:handle */
 
 describe("GET /companies/:handle", function () {

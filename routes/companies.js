@@ -58,21 +58,14 @@ router.get("/", async function (req, res, next) {
   const queries = Object.keys(req.query);
   const queryCopy = req.query;
 
-  //console.log("type of=", typeof req.query.minEmployees);
-  //console.log("minEmployees=", req.query.minEmployees);
-
   if (queries.length) {
     if ("minEmployees" in req.query) {
-      //console.log("we got here!");
       queryCopy.minEmployees = Number(queryCopy.minEmployees);
-      //console.log("should be integer here-", typeof queryCopy.minEmployees);
     }
 
     if ("maxEmployees" in req.query) {
-      queryCopy.maxEmployees = Number(queryCopy.maxEmployees);
+      req.query.maxEmployees = Number(req.query.maxEmployees);
     }
-
-    //console.log("numberReqQuery=", req.query);
 
     const result = jsonschema.validate(queryCopy, companySearchSchema, { required: true });
 
@@ -81,7 +74,6 @@ router.get("/", async function (req, res, next) {
       throw new BadRequestError(errs);
     } else {
       companies = await Company.filterCompanies(queryCopy);
-      console.log("querycopy=",queryCopy);
     }
   } else {
     companies = await Company.findAll();

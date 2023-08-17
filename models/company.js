@@ -76,8 +76,6 @@ class Company {
    */
   static async filterCompanies(queryData) {
     const { where, values } = this.getFilteredQuery(queryData);
-    console.log("where clause=", where);
-    console.log('values clause=', values);
 
     const companiesRes = await db.query(`
     SELECT handle,
@@ -123,8 +121,8 @@ class Company {
    * Excepts any combinations of => { numLike, minEmployees, maxEmployees }
    *
    * Returns  ==> {
-   *  where: "name ILIKE %$1% AND num_employees <= $2 AND num_employees >= $3",
-   *  values: ['dev', 500, 100]
+   *  where: "name ILIKE $1 AND num_employees <= $2 AND num_employees >= $3",
+   *  values: ['%dev%', 500, 100]
    *  }
    *
    *  Throws BadRequestErrors if no data was sent or if minEmployees is greater
@@ -142,29 +140,32 @@ class Company {
       throw new BadRequestError("minEmployees must be less than maxEmployees");
     }
 
-    const whereQuery = [];
-
-    for (let i = 0; i < keys.length; i++) {
-      if (keys[i] === "nameLike") {
-        whereQuery.push(`name ILIKE $${i + 1}`);
-      } else if (keys[i] === "minEmployees") {
-        whereQuery.push(`num_employees >= $${i + 1}`);
-      } else if (keys[i] === "maxEmployees") {
-        whereQuery.push(`num_employees <= $${i + 1}`);
-      }
-    };
-
-    console.log("whereQuery=", whereQuery);
-    console.log("values=", Object.values(queryData));
-
     if(queryData.nameLike){
       const val = queryData.nameLike;
       queryData.nameLike = `%${val}%`;
     }
 
+    const whereQuery = [];
+    const values = [];
+
+    for (let i = 0; i < keys.length; i++) {
+      const key = keys[i];
+      console.log("key=", key);
+      if (key === "nameLike") {
+        whereQuery.push(`name ILIKE $${i + 1}`);
+        values.push(queryData[key]);
+      } else if (key === "minEmployees") {
+        whereQuery.push(`num_employees >= $${i + 1}`);
+        values.push(queryData[key]);
+      } else if (key === "maxEmployees") {
+        whereQuery.push(`num_employees <= $${i + 1}`);
+        values.push(queryData[key]);
+      }
+    };
+
     return {
       where: whereQuery.join(' AND '),
-      values: Object.values(queryData)
+      values: values
     };
 
   }

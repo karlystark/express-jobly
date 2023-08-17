@@ -16,6 +16,7 @@ function next(err) {
   if (err) throw new Error("Got error from middleware");
 }
 
+/************************************** authenticateJWT */
 
 describe("authenticateJWT", function () {
   test("works: via header", function () {
@@ -46,6 +47,7 @@ describe("authenticateJWT", function () {
   });
 });
 
+/************************************** ensureLoggedIn */
 
 describe("ensureLoggedIn", function () {
   test("works", function () {
@@ -68,3 +70,20 @@ describe("ensureLoggedIn", function () {
         .toThrow(UnauthorizedError);
   });
 });
+
+/************************************** ensureAdmin */
+
+describe("ensureAdmin", async function(){
+  test("works if user has admin status", async function(){
+    const req = {};
+    const res = { locals: { user: { username: "u3" }}};
+    await ensureAdmin(req, res, next);
+  });
+
+  test("returns unauthorized if user does not have admin status", async function(){
+    const req = {};
+    const res = { locals: { user: { username: "u2" }}};
+    expect(await ensureAdmin(req, res, next))
+        .toThrow(UnauthorizedError);
+  });
+})
