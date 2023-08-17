@@ -38,12 +38,12 @@ class Company {
                     description,
                     num_employees AS "numEmployees",
                     logo_url AS "logoUrl"`, [
-          handle,
-          name,
-          description,
-          numEmployees,
-          logoUrl,
-        ],
+      handle,
+      name,
+      description,
+      numEmployees,
+      logoUrl,
+    ],
     );
     const company = result.rows[0];
 
@@ -67,6 +67,29 @@ class Company {
     return companiesRes.rows;
   }
 
+  /** Given search query data, returns companies that match the search criteria
+   *
+   * @param {*} queryData => Takes an object that can hold any of the following
+   * { numLike, minEmployees, maxEmployees }
+   * @returns => {handle, name, description, numEmployees, logoURL} for companies
+   * matching search criteria
+   */
+  static async filter(queryData) {
+    const { where, values } = this.getFilteredQuery(queryData);
+
+    const companiesRes = await db.query(`
+    SELECT handle,
+           name,
+           description,
+           num_employees AS "numEmployees",
+           logo_url AS "logoURL"
+    FROM companies
+    WHERE ${where}`, [...values]);
+
+    // console.log("companiesRes", companiesRes.rows);
+    return companiesRes.rows;
+  }
+
   /** Given a company handle, return data about company.
    *
    * Returns { handle, name, description, numEmployees, logoUrl, jobs }
@@ -77,7 +100,7 @@ class Company {
 
   static async get(handle) {
     const companyRes = await db.query(`
-        SELECT handle, 
+        SELECT handle,
                name,
                description,
                num_employees AS "numEmployees",
@@ -91,6 +114,63 @@ class Company {
 
     return company;
   }
+
+  /** Given an object that holds search query data, return sql-friendly WHERE
+   * clause and an array of query values.
+   *
+   * Excepts any combinations of => { numLike, minEmployees, maxEmployees }
+   *
+   * Returns  ==> {
+   *  where: "name ILIKE %$1% AND num_employees <= $2 AND num_employees >= $3",
+   *  values: ['dev', 500, 100]
+   *  }
+   *
+   *  Throws BadRequestErrors if no data was sent or if minEmployees is greater
+   *  than maxEmployees
+   * */
+
+  static getFilteredQuery(queryData) {
+    const keys = Object.keys(queryData);
+
+    if (keys.length === 0) {
+      throw new BadRequestError("No data");
+    }
+
+    if (Number(queryData.minEmployees) > Number(queryData.maxEmployees)) {
+      throw new BadRequestError("minEmployees must be less than maxEmployees");
+    }
+
+    const whereQuery = [];
+
+    for (let i = 0; i < keys.length; i++) {
+      if (keys[i] === "nameLike") {
+        whereQuery.push(`name ILIKE %$${i + 1}%`);
+      } else if (keys[i] === "minEmployees") {
+        whereQuery.push(`num_employees <= $${i + 1}`);
+        queryData.minEmployees = Number(queryData.minEmployees);
+      } else if (keys[i] === "maxEmployees") {
+        whereQuery.push(`num_employees >= $${i + 1}`);
+        queryData.maxEmployees = Number(queryData.maxEmployees);
+      }
+    };
+
+    //   const whereQuery= keys.map((key, idx) => {
+    //     if(key === "nameLike"){
+    //     `name ILIKE %$${idx + 1}%`;
+    //   } else if (key === "minEmployees"){
+    //     `num_employees <= $${idx + 1}`;
+    //   } else if (key === "maxEmployees") {
+    //     `num_employees >= $${idx + 1}`;
+    //  }});
+    console.log("whereQuery=", whereQuery);
+
+    return {
+      where: whereQuery.join(' AND '),
+      values: Object.values(queryData)
+    };
+
+  }
+
 
   /** Update company data with `data`.
    *
@@ -106,11 +186,11 @@ class Company {
 
   static async update(handle, data) {
     const { setCols, values } = sqlForPartialUpdate(
-        data,
-        {
-          numEmployees: "num_employees",
-          logoUrl: "logo_url",
-        });
+      data,
+      {
+        numEmployees: "num_employees",
+        logoUrl: "logo_url",
+      });
     const handleVarIdx = "$" + (values.length + 1);
 
     const querySql = `

@@ -31,7 +31,7 @@ describe("create", function () {
     expect(company).toEqual(newCompany);
 
     const result = await db.query(
-          `SELECT handle, name, description, num_employees, logo_url
+      `SELECT handle, name, description, num_employees, logo_url
            FROM companies
            WHERE handle = 'new'`);
     expect(result.rows).toEqual([
@@ -111,6 +111,72 @@ describe("get", function () {
   });
 });
 
+/************************************** getFilteredQuery */
+
+describe("getFilteredQuery", function () {
+  test("returns expected results when passed all three queries in queryData",
+    function () {
+      const result = getFilteredQuery({
+        nameLike: "dev",
+        minEmployees: "100",
+        maxEmployees: "5000"
+      });
+
+      expect(result).toEqual({
+        where: "name ILIKE %$1% AND num_employees <= $2 AND num_employees >= $3",
+        values: ['dev', 100, 5000]
+      });
+    });
+
+
+  test("returns expected results when passed two queries in queryData",
+    function () {
+      const result = getFilteredQuery({
+        nameLike: "dev",
+        maxEmployees: "5000"
+      });
+
+      expect(result).toEqual({
+        where: "name ILIKE %$1% AND num_employees >= $2",
+        values: ['dev', 5000]
+      });
+    });
+
+  test("returns expected results when passed one query in queryData",
+    function () {
+      const result = getFilteredQuery({
+        maxEmployees: "5000"
+      });
+
+      expect(result).toEqual({
+        where: "num_employees >= $1",
+        values: [5000]
+      });
+    });
+
+  test("returns BadRequestError when no data passed", function () {
+    try {
+      const result = getFilteredQuery({});
+    } catch (err) {
+      expect(err instanceof BadRequestError).toBeTruthy();
+    }
+  });
+
+  test("return BadRequestError when minEmployees is greater than maxEmployees",
+    function () {
+      try {
+        const result = getFilteredQuery({
+          minEmployees: "5000",
+          maxEmployees: "100"
+        });
+      } catch (err) {
+        expect(err instanceof BadRequestError).toBeTruthy();
+      }
+    });
+
+});
+
+
 /************************************** update */
 
 describe("update", function () {
@@ -129,7 +195,7 @@ describe("update", function () {
     });
 
     const result = await db.query(
-          `SELECT handle, name, description, num_employees, logo_url
+      `SELECT handle, name, description, num_employees, logo_url
            FROM companies
            WHERE handle = 'c1'`);
     expect(result.rows).toEqual([{
@@ -156,7 +222,7 @@ describe("update", function () {
     });
 
     const result = await db.query(
-          `SELECT handle, name, description, num_employees, logo_url
+      `SELECT handle, name, description, num_employees, logo_url
            FROM companies
            WHERE handle = 'c1'`);
     expect(result.rows).toEqual([{
@@ -193,7 +259,7 @@ describe("remove", function () {
   test("works", async function () {
     await Company.remove("c1");
     const res = await db.query(
-        "SELECT handle FROM companies WHERE handle='c1'");
+      "SELECT handle FROM companies WHERE handle='c1'");
     expect(res.rows.length).toEqual(0);
   });
 
