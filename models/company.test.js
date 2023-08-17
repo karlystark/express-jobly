@@ -87,6 +87,11 @@ describe("findAll", function () {
   });
 });
 
+/************************************** filterCompanies */
+
+
+
+
 /************************************** get */
 
 describe("get", function () {
@@ -116,47 +121,47 @@ describe("get", function () {
 describe("getFilteredQuery", function () {
   test("returns expected results when passed all three queries in queryData",
     function () {
-      const result = getFilteredQuery({
-        nameLike: "dev",
-        minEmployees: "100",
-        maxEmployees: "5000"
+      const result = Company.getFilteredQuery({
+        nameLike: "c",
+        minEmployees: "2",
+        maxEmployees: "3"
       });
 
       expect(result).toEqual({
-        where: "name ILIKE %$1% AND num_employees <= $2 AND num_employees >= $3",
-        values: ['dev', 100, 5000]
+        where: "name ILIKE $1 AND num_employees >= $2 AND num_employees <= $3",
+        values: ['%c%', 2, 3]
       });
     });
 
 
   test("returns expected results when passed two queries in queryData",
     function () {
-      const result = getFilteredQuery({
-        nameLike: "dev",
-        maxEmployees: "5000"
+      const result = Company.getFilteredQuery({
+        nameLike: "c",
+        maxEmployees: "3"
       });
 
       expect(result).toEqual({
-        where: "name ILIKE %$1% AND num_employees >= $2",
-        values: ['dev', 5000]
+        where: "name ILIKE $1 AND num_employees <= $2",
+        values: ['%c%', 3]
       });
     });
 
   test("returns expected results when passed one query in queryData",
     function () {
-      const result = getFilteredQuery({
-        maxEmployees: "5000"
+      const result = Company.getFilteredQuery({
+        maxEmployees: "3"
       });
 
       expect(result).toEqual({
-        where: "num_employees >= $1",
-        values: [5000]
+        where: "num_employees <= $1",
+        values: [3]
       });
     });
 
   test("returns BadRequestError when no data passed", function () {
     try {
-      const result = getFilteredQuery({});
+      const result = Company.getFilteredQuery({});
     } catch (err) {
       expect(err instanceof BadRequestError).toBeTruthy();
     }
@@ -165,9 +170,9 @@ describe("getFilteredQuery", function () {
   test("return BadRequestError when minEmployees is greater than maxEmployees",
     function () {
       try {
-        const result = getFilteredQuery({
-          minEmployees: "5000",
-          maxEmployees: "100"
+        const result = Company.getFilteredQuery({
+          minEmployees: "3",
+          maxEmployees: "1"
         });
       } catch (err) {
         expect(err instanceof BadRequestError).toBeTruthy();
