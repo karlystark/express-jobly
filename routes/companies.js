@@ -22,7 +22,7 @@ const router = new express.Router();
  *
  * Returns { handle, name, description, numEmployees, logoUrl }
  *
- * Authorization required: login
+ * Authorization required: login and admin status
  */
 
 router.post("/", ensureLoggedIn, ensureAdmin, async function (req, res, next) {
@@ -64,7 +64,7 @@ router.get("/", async function (req, res, next) {
     }
 
     if ("maxEmployees" in req.query) {
-      req.query.maxEmployees = Number(req.query.maxEmployees);
+      queryCopy.maxEmployees = Number(queryCopy.maxEmployees);
     }
 
     const result = jsonschema.validate(queryCopy, companySearchSchema, { required: true });
@@ -103,7 +103,7 @@ router.get("/:handle", async function (req, res, next) {
  *
  * Returns { handle, name, description, numEmployees, logo_url }
  *
- * Authorization required: login
+ * Authorization required: login and admin status
  */
 
 router.patch("/:handle", ensureLoggedIn, ensureAdmin, async function (req, res, next) {
@@ -123,7 +123,7 @@ router.patch("/:handle", ensureLoggedIn, ensureAdmin, async function (req, res, 
 
 /** DELETE /[handle]  =>  { deleted: handle }
  *
- * Authorization: login
+ * Authorization: login and admin status
  */
 
 router.delete("/:handle", ensureLoggedIn, ensureAdmin, async function (req, res, next) {

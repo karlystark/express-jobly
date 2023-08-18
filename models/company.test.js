@@ -188,6 +188,7 @@ describe("getFilteredQuery", function () {
   test("returns BadRequestError when no data passed", function () {
     try {
       const result = Company.getFilteredQuery({});
+      throw new Error();
     } catch (err) {
       expect(err instanceof BadRequestError).toBeTruthy();
     }
@@ -200,7 +201,7 @@ describe("getFilteredQuery", function () {
           minEmployees: 3,
           maxEmployees: 1
         });
-        throw new Error(); // best practice for error tests 
+        throw new Error(); // best practice for error tests
       } catch (err) {
         expect(err instanceof BadRequestError).toBeTruthy();
       }
