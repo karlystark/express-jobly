@@ -119,8 +119,13 @@ describe("ensureCorrectUserOrAdmin", function() {
         .toThrow(UnauthorizedError);
   });
 
-  test("returns unauthorized if ")
-})
+  test("returns unauthorized if user is neither an admin nor matches the route username", function(){
+    const req = {params: {username: "bob"}};
+    const res = {locals: { user: { username: "test", isAdmin: false}}};
+    expect(() => ensureCorrectUserOrAdmin(req, res, next))
+        .toThrow(UnauthorizedError);
+  });
+});
 
 
 
