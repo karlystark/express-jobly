@@ -105,12 +105,21 @@ describe("ensureCorrectUserOrAdmin", function() {
     ensureCorrectUserOrAdmin(req, res, next);
   });
 
-  test("returns unauthorized if the user is not logged in", function() {
+  test("returns unauthorized if no user is logged in", function() {
     const req = {params: { username: "test"}};
     const res = {locals: {} };
     expect(()=> ensureCorrectUserOrAdmin(req, res, next))
-    .toThrow(UnauthorizedError);
+        .toThrow(UnauthorizedError);
   });
+
+  test("returns unauthorized if no valid login", function(){
+    const req = {params: { username: "test"}};
+    const res = {locals: {} };
+    expect(() => ensureCorrectUserOrAdmin(req, res, next))
+        .toThrow(UnauthorizedError);
+  });
+
+  test("returns unauthorized if ")
 })
 
 
