@@ -88,7 +88,21 @@ describe("ensureAdmin", function(){
     expect(()=> ensureAdmin(req, res, next))
         .toThrow(UnauthorizedError);
   });
-})
+
+  test("returns unauthorized if user's admin status is a truthy value, but not true", function(){
+    const req = {};
+    const res = { locals: { user: { username: "u1", isAdmin: false }}};
+    expect(()=> ensureAdmin(req, res, next))
+        .toThrow(UnauthorizedError);
+  })
+
+  test("returns unauthorized if no login", function () {
+    const req = {};
+    const res = { locals: {} };
+    expect(() => ensureAdmin(req, res, next))
+        .toThrow(UnauthorizedError);
+  });
+});
 
 /************************************** ensureCorrectUserOrAdmin */
 
@@ -114,7 +128,7 @@ describe("ensureCorrectUserOrAdmin", function() {
 
   test("returns unauthorized if no valid login", function(){
     const req = {params: { username: "test"}};
-    const res = {locals: {} };
+    const res = {locals: { user: { } } };
     expect(() => ensureCorrectUserOrAdmin(req, res, next))
         .toThrow(UnauthorizedError);
   });

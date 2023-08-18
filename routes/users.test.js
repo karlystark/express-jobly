@@ -12,7 +12,7 @@ const {
   commonAfterEach,
   commonAfterAll,
   u1Token,
-  u3Token
+  u3Token //name this by adminToken
 } = require("./_testCommon");
 
 beforeAll(commonBeforeAll);
@@ -288,6 +288,26 @@ describe("PATCH /users/:username", () => {
     expect(resp.statusCode).toEqual(401);
   });
 
+  test("unauth for user trying to change their admin status", async function () {
+    const resp = await request(app)
+        .patch(`/users/u1`)
+        .send({
+          isAdmin: true,
+        })
+        .set("authorization", `Bearer ${u1Token}`);
+    expect(resp.statusCode).toEqual(400);
+  });
+
+  test("unauth for user sending bad data who is also unauth user", async function () {
+    const resp = await request(app)
+        .patch(`/users/u2`)
+        .send({
+          homeTown: "New York",
+        })
+        .set("authorization", `Bearer ${u1Token}`);
+    expect(resp.statusCode).toEqual(401);
+  });
+
   test("not found if no such user", async function () {
     const resp = await request(app)
         .patch(`/users/nope`)
@@ -328,6 +348,7 @@ describe("PATCH /users/:username", () => {
     expect(isSuccessful).toBeTruthy();
   });
 });
+
 
 /************************************** DELETE /users/:username */
 
