@@ -5,6 +5,8 @@ const { UnauthorizedError } = require("../expressError");
 const {
   authenticateJWT,
   ensureLoggedIn,
+  ensureAdmin,
+  ensureCorrectUserOrAdmin
 } = require("./auth");
 
 
@@ -73,17 +75,43 @@ describe("ensureLoggedIn", function () {
 
 /************************************** ensureAdmin */
 
-describe("ensureAdmin", async function(){
-  test("works if user has admin status", async function(){
+describe("ensureAdmin", function(){
+  test("works if user has admin status", function(){
     const req = {};
-    const res = { locals: { user: { username: "u3" }}};
-    await ensureAdmin(req, res, next);
+    const res = { locals: { user: { username: "u3", isAdmin: true }}};
+    ensureAdmin(req, res, next);
   });
 
-  test("returns unauthorized if user does not have admin status", async function(){
+  test("returns unauthorized if user does not have admin status", function(){
     const req = {};
-    const res = { locals: { user: { username: "u2" }}};
-    expect(await ensureAdmin(req, res, next))
+    const res = { locals: { user: { username: "u1", isAdmin: false }}};
+    expect(()=> ensureAdmin(req, res, next))
         .toThrow(UnauthorizedError);
   });
 })
+
+/************************************** ensureCorrectUserOrAdmin */
+
+describe("ensureCorrectUserOrAdmin", function() {
+  test("works if user is the correct user", function(){
+    const req =  {params: { username: "test"}};
+    const res = { locals: { user: { username: "test", isAdmin: false }}};
+    ensureCorrectUserOrAdmin(req, res, next);
+  });
+
+  test("works if user is an admin", function(){
+    const req = {params: { username: "bob"}};
+    const res = { locals: { user: { username: "test", isAdmin: true }}};
+    ensureCorrectUserOrAdmin(req, res, next);
+  });
+
+  test("returns unauthorized if the user is not logged in", function() {
+    const req = {params: { username: "test"}};
+    const res = {locals: {} };
+    expect(()=> ensureCorrectUserOrAdmin(req, res, next))
+    .toThrow(UnauthorizedError);
+  });
+})
+
+
+

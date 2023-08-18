@@ -48,19 +48,6 @@ class User {
     throw new UnauthorizedError("Invalid username/password");
   }
 
-  /** authenticates if user has admin permissions, returns boolean
-   **/
-
-  static async isAdmin(username){
-    const result = await db.query(
-      `SELECT is_admin
-        FROM users
-        WHERE username = $1`, [username]
-    );
-
-    return result.is_admin;
-  }
-
 
   /** Register user with data.
    *
