@@ -25,6 +25,8 @@ const router = express.Router();
  *  {user: { username, firstName, lastName, email, isAdmin }, token }
  *
  * Authorization required: Login and Admin Status
+ *
+ * Throws Bad Request Errors if data provided invalid
  **/
 
 router.post("/", ensureLoggedIn, ensureAdmin, async function (req, res, next) {
@@ -78,6 +80,8 @@ router.get("/:username", ensureCorrectUserOrAdmin, async function (req, res, nex
  * Returns { username, firstName, lastName, email, isAdmin }
  *
  * Authorization required: Valid User or Admin Status
+ *
+ * Throws Bad Request Errors if data provided invalid
  **/
 
 router.patch("/:username", ensureCorrectUserOrAdmin, async function (req, res, next) {

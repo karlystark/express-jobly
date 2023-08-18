@@ -22,7 +22,9 @@ const router = new express.Router();
  *
  * Returns { handle, name, description, numEmployees, logoUrl }
  *
- * Authorization required: login and admin status
+ * Authorization required: Login and Admin status
+ *
+ * Throws Bad Request Errors if data provided invalid
  */
 
 router.post("/", ensureLoggedIn, ensureAdmin, async function (req, res, next) {
@@ -103,7 +105,9 @@ router.get("/:handle", async function (req, res, next) {
  *
  * Returns { handle, name, description, numEmployees, logo_url }
  *
- * Authorization required: login and admin status
+ * Authorization required: Login and Admin status
+ *
+ * Throws Bad Request Errors if data provided invalid
  */
 
 router.patch("/:handle", ensureLoggedIn, ensureAdmin, async function (req, res, next) {
@@ -123,7 +127,7 @@ router.patch("/:handle", ensureLoggedIn, ensureAdmin, async function (req, res, 
 
 /** DELETE /[handle]  =>  { deleted: handle }
  *
- * Authorization: login and admin status
+ * Authorization: Login and Admin status
  */
 
 router.delete("/:handle", ensureLoggedIn, ensureAdmin, async function (req, res, next) {
